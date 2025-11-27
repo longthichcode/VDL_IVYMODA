@@ -19,4 +19,13 @@ public interface HoaDonDao {
 
     @Delete
     void delete(HoaDon hd);
+
+    @Query("UPDATE HoaDon SET trangThai = :trangThai WHERE orderCode = :maHoaDon")
+    void updateTrangThai(int maHoaDon, String trangThai);
+
+    @Query("UPDATE hoadon SET trangThai = :trangThai WHERE orderCode = :orderCode")
+    void updateTrangThaiByOrderCode(int orderCode, String trangThai);
+
+    @Query("SELECT * FROM HoaDon WHERE orderCode = :orderCode LIMIT 1")
+    HoaDon getHoaDonByOrderCode(int orderCode);
 }

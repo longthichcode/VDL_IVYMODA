@@ -23,4 +23,21 @@ public class TaiKhoan {
     @ColumnInfo(index = true)
     public int maVaiTro;
     public Date ngayTao;
+
+    @Override
+    public String toString() {
+        return "TaiKhoan{" +
+                "maTaiKhoan=" + maTaiKhoan +
+                ", matKhau='" + matKhau + '\'' +
+                ", tenDangNhap='" + tenDangNhap + '\'' +
+                ", soDienThoai='" + soDienThoai + '\'' +
+                ", email='" + email + '\'' +
+                ", hoTen='" + hoTen + '\'' +
+                ", ngaySinh=" + ngaySinh +
+                ", diaChi='" + diaChi + '\'' +
+                ", gioiTinh='" + gioiTinh + '\'' +
+                ", maVaiTro=" + maVaiTro +
+                ", ngayTao=" + ngayTao +
+                '}';
+    }
 }

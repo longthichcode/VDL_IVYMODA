@@ -80,6 +80,16 @@
         android:paddingHorizontal="8dp"
         android:clipToPadding="false" />
 
+    <Button
+        android:id="@+id/btnTestCheckout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TEST THANH TOÁN"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#E91E63"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="16dp"/>
+
     <!-- Bottom Navigation -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNav"
@@ -90,5 +100,4 @@
         app:itemTextColor="@color/bottom_nav_selector"
         app:labelVisibilityMode="labeled"
         android:background="#FFFFFF" />
-
 </LinearLayout>

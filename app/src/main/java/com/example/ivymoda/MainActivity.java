@@ -1,5 +1,6 @@
 package com.example.ivymoda;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
@@ -20,11 +21,16 @@ import androidx.appcompat.widget.AppCompatCheckBox;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.ivymoda.Activity.CheckoutActivity;
 import com.example.ivymoda.Adapter.SanPhamAdapter;
 import com.example.ivymoda.DAO.DanhMucDao;
 import com.example.ivymoda.DAO.SanPhamDao;
 import com.example.ivymoda.Entity.DanhMuc;
+import com.example.ivymoda.Entity.GioHang;
+import com.example.ivymoda.Entity.GioHang_SanPham;
 import com.example.ivymoda.Entity.SanPham;
+import com.example.ivymoda.Entity.TaiKhoan;
+import com.example.ivymoda.Entity.VaiTro;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
 
@@ -69,6 +75,16 @@ public class MainActivity extends AppCompatActivity {
 
         // === CHÈN DỮ LIỆU + TẢI ===
         insertSampleData();
+
+        //nhấn nút test checkout
+        Button btnTestCheckout = findViewById(R.id.btnTestCheckout);
+        if (btnTestCheckout != null) {
+            btnTestCheckout.setOnClickListener(v -> {
+                Toast.makeText(this, "Đang chuẩn bị giỏ hàng test...", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(MainActivity.this, CheckoutActivity.class));
+                Toast.makeText(this, "Đã chuyển sang trang thanh toán!", Toast.LENGTH_LONG).show();
+            });
+        }
     }
 
     // Biến để lưu trạng thái sắp xếp hiện tại
@@ -140,6 +156,74 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
 
+            // ==================== THÊM DỮ LIỆU ĐỂ TEST THANH TOÁN ====================
+
+            // 1. Tạo vai trò (nếu chưa có)
+            if (db.vaiTroDao().getAll().isEmpty()) {
+                VaiTro khach = new VaiTro();
+                khach.tenVaiTro = "Khách hàng";
+                VaiTro admin = new VaiTro();
+                admin.tenVaiTro = "Quản trị viên";
+                db.vaiTroDao().insert(khach);
+                db.vaiTroDao().insert(admin);
+            }
+            // 2. Tạo user test (nếu chưa có)
+            if (db.taiKhoanDao().getByTenDangNhap("testuser") == null) {
+                TaiKhoan testUser = new TaiKhoan();
+                testUser.tenDangNhap = "testuser";
+                testUser.matKhau = "123456";
+                testUser.hoTen = "Người Dùng Test";
+                testUser.email = "test@ivymoda.com";
+                testUser.soDienThoai = "0909999999";
+                testUser.maVaiTro = 1; // Khách hàng
+                testUser.ngayTao = new Date();
+                db.taiKhoanDao().insert(testUser);
+            }
+
+            // 3. TẠO GIỎ HÀNG + SẢN PHẨM CHO testuser – 100% KHÔNG LỖI FOREIGN KEY
+            TaiKhoan currentUser = db.taiKhoanDao().getByTenDangNhap("testuser");
+            if (currentUser != null) {
+                try {
+                    // XÓA GIỎ HÀNG CŨ NẾU CÓ
+                    GioHang oldCart = db.gioHangDao().getByTaiKhoan(currentUser.maTaiKhoan);
+                    if (oldCart != null) {
+                        db.gioHangSPDao().deleteByGioHang(oldCart.maGioHang);
+                        db.gioHangDao().delete(oldCart);
+                    }
+
+                    // TẠO GIỎ HÀNG MỚI
+                    GioHang gioHang = new GioHang();
+                    gioHang.maTaiKhoan = currentUser.maTaiKhoan;
+                    gioHang.ngayTao = new Date();
+                    db.gioHangDao().insert(gioHang);  // ← Room tự sinh maGioHang
+
+                    // LẤY LẠI GIỎ HÀNG VỪA TẠO ĐỂ CÓ maGioHang CHÍNH XÁC
+                    GioHang newCart = db.gioHangDao().getByTaiKhoan(currentUser.maTaiKhoan);
+                    if (newCart == null) {
+                        Log.e("TEST_PAYMENT", "Tạo giỏ hàng thất bại!");
+                    } else {
+                        List<SanPham> allSP = spDao.getAll();
+                        if (allSP.size() >= 2) {
+                            GioHang_SanPham item1 = new GioHang_SanPham();
+                            item1.maGioHang = newCart.maGioHang;
+                            item1.maSanPham = allSP.get(0).maSanPham;
+                            item1.soLuong = 1;
+                            db.gioHangSPDao().insert(item1);
+
+                            GioHang_SanPham item2 = new GioHang_SanPham();
+                            item2.maGioHang = newCart.maGioHang;
+                            item2.maSanPham = allSP.get(1).maSanPham;
+                            item2.soLuong = 1;
+                            db.gioHangSPDao().insert(item2);
+
+                            Log.d("TEST_PAYMENT", "THÀNH CÔNG! Giỏ hàng testuser có 2 sản phẩm – maGioHang = " + newCart.maGioHang);
+                        }
+                    }
+                } catch (Exception e) {
+                    Log.e("INSERT_ERROR", "Lỗi tạo giỏ hàng: ", e);
+                }
+            }
+            // ======================================================================
             runOnUiThread(this::loadSanPham);
         }).start();
     }

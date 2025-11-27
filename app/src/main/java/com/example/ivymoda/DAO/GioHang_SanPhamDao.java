@@ -21,4 +21,7 @@ public interface GioHang_SanPhamDao {
 
     @Query("DELETE FROM GioHang_SanPham WHERE maGioHang = :maGioHang")
     void clearGioHang(int maGioHang);
+
+    @Query("DELETE FROM GioHang_SanPham WHERE maGioHang = :maGioHang")
+    void deleteByGioHang(int maGioHang);
 }

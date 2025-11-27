@@ -8,8 +8,12 @@ import java.util.List;
 
 @Dao
 public interface GioHangDao {
-    @Query("SELECT * FROM GioHang WHERE maTaiKhoan = :maTaiKhoan")
+
+    @Query("SELECT * FROM GioHang WHERE maTaiKhoan = :maTaiKhoan ORDER BY maGioHang DESC LIMIT 1")
     GioHang getByTaiKhoan(int maTaiKhoan);
+
+    @Query("SELECT maGioHang FROM giohang WHERE maTaiKhoan = :maTaiKhoan LIMIT 1")
+    int getMaGioHangByTaiKhoan(int maTaiKhoan);
 
     @Insert
     void insert(GioHang gh);

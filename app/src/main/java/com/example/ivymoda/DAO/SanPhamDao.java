@@ -7,17 +7,21 @@ import java.util.List;
 
 @Dao
 public interface SanPhamDao {
-    @Query("SELECT * FROM SanPham ORDER BY ngayTao DESC")
+
+    @Query("SELECT * FROM SanPham")
     List<SanPham> getAll();
+
+    @Query("SELECT * FROM SanPham WHERE maSanPham = :maSanPham LIMIT 1")
+    SanPham getById(int maSanPham);   // ĐÃ THÊM @Query → KHÔNG CÒN LỖI!
 
     @Query("SELECT * FROM SanPham WHERE maDanhMuc = :maDanhMuc")
     List<SanPham> getByDanhMuc(int maDanhMuc);
 
-    @Query("SELECT * FROM SanPham WHERE tenSanPham LIKE '%' || :keyword || '%'")
-    List<SanPham> search(String keyword);
-
     @Insert
     void insert(SanPham sp);
+
+    @Insert
+    void insertAll(List<SanPham> list);
 
     @Update
     void update(SanPham sp);

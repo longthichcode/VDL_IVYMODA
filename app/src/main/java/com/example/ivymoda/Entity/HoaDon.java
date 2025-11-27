@@ -10,7 +10,8 @@ import java.util.Date;
 public class HoaDon {
     @PrimaryKey(autoGenerate = true)
     public int maHoaDon;
-
+    @ColumnInfo(name = "orderCode")
+    public int orderCode;
     public String trangThai;
     public String diaChiNhanHang;
     public Date thoiGianNhanHang;

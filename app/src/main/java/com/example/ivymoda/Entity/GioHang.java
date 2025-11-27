@@ -13,4 +13,13 @@ public class GioHang {
     @ColumnInfo(index = true)
     public int maTaiKhoan;
     public Date ngayTao;
+
+    @Override
+    public String toString() {
+        return "GioHang{" +
+                "maGioHang=" + maGioHang +
+                ", maTaiKhoan=" + maTaiKhoan +
+                ", ngayTao=" + ngayTao +
+                '}';
+    }
 }
